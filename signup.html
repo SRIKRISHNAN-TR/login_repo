@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h2 { text-align: center; }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .message { margin-top: 10px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Signup</h2>
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="signup()">Signup</button>
+    <h3>Already have an account?</h3>
+    <button onclick="window.location.href='login.html'">Login</button>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    function signup() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        if(password.length === 0){
+            document.getElementById('message').innerHTML = "Password cannot be empty.";
+            document.getElementById('message').style.color = 'red';
+        }
+        if(name.length === 0){
+            document.getElementById('message').innerHTML = "Name cannot be empty.";
+            document.getElementById('message').style.color = 'red';
+        }
+        if(email.length === 0){
+            document.getElementById('message').innerHTML = "Email cannot be empty";
+            document.getElementById('message').style.color = 'red';
+        }
+        if(email.length != 0 && password.length !=0 && name.length != 0){
+        axios.post('http://localhost:8081/signup', {
+            name: name,
+            email: email,
+            password: password
+        })
+        .then(response => {
+            document.getElementById('message').innerText = 'Signup successful!';
+            document.getElementById('message').style.color = 'green';
+        })
+        .catch(error => {       
+            document.getElementById('message').innerText = 'Signup failed. ' + error.response.data.error;
+            document.getElementById('message').style.color = 'red';
+        });
+    }
+}
+</script>
+
+</body>
+</html>

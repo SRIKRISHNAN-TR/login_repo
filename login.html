@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h2 { text-align: center; }
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .message { margin-top: 10px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <h3>Don’t have an account?</h3>
+    <button onclick="window.location.href='signup.html'">Signup</button>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if(email.length === 0) {
+            document.getElementById('message').innerText = "Email cannot be empty";
+            document.getElementById('message').style.color = 'red';
+            return;
+        }
+        
+        if(password.length === 0) {
+            document.getElementById('message').innerText = "Password cannot be empty";
+            document.getElementById('message').style.color = 'red';
+            return;
+        }
+
+        axios.post('http://localhost:8081/login', {
+            email: email,
+            password: password
+        })
+        .then(response => {
+            document.getElementById('message').innerText = 'Login successful!';
+            document.getElementById('message').style.color = 'green';
+            
+            // Redirect to the main page after successful login
+            setTimeout(() => {
+                window.location.href = 'main.html'; // Redirect to your desired page
+            }, 1000);
+        })
+        .catch(error => {
+            document.getElementById('message').innerText = 'Login failed. ' + (error.response ? error.response.data.error : 'Unknown error');
+            document.getElementById('message').style.color = 'red';
+        });
+    }
+</script>
+
+</body>
+</html>
