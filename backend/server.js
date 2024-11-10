@@ -70,6 +70,56 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Fetch all users endpoint
+app.get('/users', (req, res) => {
+    const sql = "SELECT * FROM login";
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Failed to fetch users" });
+        }
+        return res.json({ success: true, data: results });
+    });
+});
+
+// Delete user endpoint
+app.delete('/user', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email is required to delete user" });
+    }
+
+    const sql = "DELETE FROM login WHERE email = ?";
+    db.query(sql, [email], (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Failed to delete user" });
+        }
+        return res.json({ success: true, message: "User deleted successfully" });
+    });
+});
+
+// Update user endpoint
+app.put('/user', (req, res) => {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: "All fields are required for updating" });
+    }
+
+    const sql = "UPDATE login SET name = ?, password = ? WHERE email = ?";
+    const values = [name, password, email];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Failed to update user" });
+        }
+        return res.json({ success: true, message: "User updated successfully" });
+    });
+});
+
 // Start server
 const PORT = 8081;
 app.listen(PORT, () => {

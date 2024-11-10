@@ -56,6 +56,9 @@
         .then(response => {
             document.getElementById('message').innerText = 'Signup successful!';
             document.getElementById('message').style.color = 'green';
+            setTimeout(() => {
+                window.location.href = 'main.html'; 
+            }, 1000);
         })
         .catch(error => {       
             document.getElementById('message').innerText = 'Signup failed. ' + error.response.data.error;
