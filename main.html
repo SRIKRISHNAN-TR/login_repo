@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h2 { text-align: center; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+
+        
+        .update-btn {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .update-btn:hover {
+            background-color: #45a049;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>User Management</h2>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Fetch users and populate the table
+    function loadUsers() {
+        axios.get('http://localhost:8081/users')
+            .then(response => {
+                const users = response.data.data;
+                const userTableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                userTableBody.innerHTML = ''; 
+
+                users.forEach(user => {
+                    const row = userTableBody.insertRow();
+
+                    row.insertCell(0).innerText = user.name;
+                    row.insertCell(1).innerText = user.email;
+                    row.insertCell(2).innerText = user.password;
+
+                    // Actions (Update and Delete)
+                    const actionsCell = row.insertCell(3);
+                    const updateButton = document.createElement('button');
+                    updateButton.innerText = 'Update';
+                    updateButton.classList.add('update-btn');
+                    updateButton.onclick = () => updateUser(user.email);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'Delete';
+                    deleteButton.classList.add('delete-btn');
+                    deleteButton.onclick = () => deleteUser(user.email);
+
+                    actionsCell.appendChild(updateButton);
+                    actionsCell.appendChild(deleteButton);
+                });
+            })
+            .catch(error => console.error("There was an error fetching the users:", error));
+    }
+
+    // Update user function
+    function updateUser(email) {
+        const newName = prompt("Enter the new name:");
+        const newPassword = prompt("Enter the new password:");
+
+        if (newName && newPassword) {
+            axios.put('http://localhost:8081/user', {
+                name: newName,
+                email: email,
+                password: newPassword
+            })
+            .then(response => {
+                alert("User updated successfully");
+                loadUsers();
+            })
+            .catch(error => {
+                console.error("Error updating user:", error);
+                alert("Failed to update user");
+            });
+        } else {
+            alert("Name and password cannot be empty");
+        }
+    }
+
+    // Delete user function
+    function deleteUser(email) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            axios.delete('http://localhost:8081/user', { data: { email: email } })
+            .then(response => {
+                alert("User deleted successfully");
+                loadUsers();
+            })
+            .catch(error => {
+                console.error("Error deleting user:", error);
+                alert("Failed to delete user");
+            });
+        }
+    }
+    window.onload = loadUsers;
+</script>
+
+</body>
+</html>
